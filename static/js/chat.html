@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chaters</title>
+    <link type="text/css" rel="stylesheet" href="/static/css/chat.css">
+</head>
+<body>
+    <div id="title">
+        <h1>CH4TER5</h1>
+        <a href="/signup" class="header" id="sign_up">회원가입</a>
+        <a href="/login" class="header" id="log_in">로그인</a>
+    </div>
+    <section>
+        <nav class = "Room">
+            <ul>
+                <span class="Room">방 목록</span><br>
+                <li ><button id="Rooms">ldfs</button></li>
+                <li id="last_list"><button class="room" id="Rooms">ldfs</button></li>
+            </ul>
+        </nav>
+        <div id="chating">
+            <textarea id="chatLog" class="chat_log" readonly></textarea>
+        </div>
+        <form id="chat">
+            <input id="name" class="name" type="text" readonly>
+            <input id="message" class="message" type="text" autocomplete="off">
+            <input type="submit" class="chat" value="chat"/>
+        </form>
+    </section>
+    <script src="/socket.io/socket.io.js"></script> <!-- 1 -->
+    <script src="//code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+      var socket = io(); //1
+
+
+      $('#chat').on('submit', function(e){ //2
+        socket.emit('send message', $('#name').val(), $('#message').val());
+        $('#message').val('');
+        $('#message').focus();
+        e.preventDefault();
+      });
+      socket.on('receive message', function(msg){ //3
+        $('#chatLog').append(msg+'\n');
+        $('#chatLog').scrollTop($('#chatLog')[0].scrollHeight);
+      });
+      socket.on('change name', function(name){ //4
+        $('#name').val(name);
+      });
+    </script>
+</body>
+</html>
