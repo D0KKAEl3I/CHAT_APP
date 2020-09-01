@@ -14,18 +14,24 @@ const sequelize = require('./models').sequelize;
 sequelize.sync();
 //세션유지
 const session = require('express-session');
+const sharedsession = require('express-socket.io-session');
 const FileStore = require('session-file-store')(session);
+
+const sessionForSharing = session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: true,
+  store: new FileStore()
+});
+
 
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended : false}));
 app.use('/static', express.static(__dirname+'/static'));
-app.use(session({
-  secret: 'keyboard cat',
-  resave: false,
-  saveUninitialized: true,
-  store: new FileStore()
-}));
+app.use(sessionForSharing);
+
+io.use(sharedsession(sessionForSharing, { autoSave: true}));
 
 // const myKey = "geocashgeocash"
 
@@ -68,10 +74,10 @@ app.get('/signup',function(req, res){  //2
 });
 
 //챗관련 파트
-var count=1;
 io.on('connection', function(socket){ //3
+
   console.log('user connected: ', socket.id);  //3-1
-  var name = //3-1
+  var name = socket.handshake.session.username//3-1
   io.to(socket.id).emit('change name',name);   //3-1
 
   socket.on('disconnect', function(){ //3-2

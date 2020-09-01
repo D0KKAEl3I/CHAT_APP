@@ -34,6 +34,7 @@
     <script>
       var socket = io(); //1
 
+      
 
       $('#chat').on('submit', function(e){ //2
         socket.emit('send message', $('#name').val(), $('#message').val());
