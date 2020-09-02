@@ -73,6 +73,17 @@ app.get('/signup',function(req, res){  //2
   })
 });
 
+//튜토리얼 주소 접속
+app.get('/tuto',function(req, res){  //2
+  fs.readFile('./static/js/tutorial.html', function(err, data) {
+    if(err) {
+      res.send('에러')
+    } else {
+      res.sendFile(__dirname + '/static/js/tutorial.html')
+    }
+  })
+});
+
 //챗관련 파트
 io.on('connection', function(socket){ //3
 

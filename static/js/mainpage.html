@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Chaters</title>
     <link type="text/css" rel="stylesheet" href="/static/css/mainpage.css">
 </head>
 <body>
@@ -11,13 +11,14 @@
     <div>
         <div class="q_block" id="new">
             <h3>채터스가 처음이신가요?</h3>
-            <button>채터스 알아보기</button>
-            <button>회원가입하기</button>
+            <button id="toTuto" onClick="location.href='/tuto'">채터스 알아보기</button>
+            <br>
+            <button id="toSignup" onClick="location.href='/signup'">회원가입하기</button>
         </div>
 
         <div class="q_block" id="old">
             <h3>이미 채터스 회원이신가요?</h3>
-            <button>로그인하기</button>
+            <button onClick="location.href='/login'">로그인하기</button>
         </div>
     </div>
 </body>
