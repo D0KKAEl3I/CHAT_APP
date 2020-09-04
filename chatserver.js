@@ -39,7 +39,7 @@ io.use(sharedsession(sessionForSharing, { autoSave: true}));
 app.get('/',function(req, res){ 
   if(req.session.logined){
     //파일 찾기, 없으면 에러 출력, 있으면 설정한 페이지 전송
-    fs.readFile('./static/js/chat.html', function(err, data) {
+    fs.readFile('/static/js/chat.html', function(err, data) {
       if(err) {
         res.send('에러')
       } else {
@@ -47,9 +47,19 @@ app.get('/',function(req, res){
       }
     })
   } else {
-    res.redirect('/login')
+    res.redirect('/first_time')
   }
 });
+
+app.get('/first_time', function(req, res){
+  fs.readFile('/static/js/mainpage.html', function(err, data) {
+    if(err) {
+      res.send('에러')
+    } else {
+      res.sendFile(__dirname + '/static/js/mainpage.html')
+    }
+  })
+})
 
 //위와 마찬가지로 로그인 주소 접속
 app.get('/login',function(req, res){  //2

@@ -26,7 +26,6 @@ h2{
     font-family: 'Gothic A1', sans-serif;
     font-size: 30px;
     text-align: center;
-    animation:h1 1.2s;
 }
 
 div.MouseScroll {
@@ -60,16 +59,6 @@ button.next{
     color: rgb(46, 46, 46);
 }
 
-button.next:hover{
-    
-    transition-duration: 0.5s;
-    font-size: 30px;
-    
-}
-
-button.next.onclick{
-    
-}
 
 section {
     position: relative;
@@ -79,13 +68,12 @@ section {
     text-align: center;
     line-height: 30px;
 }
-
-.section0{
+  
+#section0{
     background-color: rgb(46, 46, 46);
-
 }
 
-.section1{
+#section1{
     background-color: #a3a1a1;
 }
 
@@ -96,7 +84,7 @@ section {
     color: #E0E3DA;
 }
 
-.section2{
+#section2{
     background-color: #D7FFF1;
 }
 
@@ -107,7 +95,7 @@ section {
     color: #77AF9C;
 }
 
-.section3{
+#section3{
     background-color: #8EC0E4;
 }
 
