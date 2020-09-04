@@ -96,9 +96,13 @@ io.on('connection', function(socket){ //3
   });
 
   socket.on('send message', function(name,text){ //3-3
-    var msg = name + ' : ' + text;
-    console.log(msg);
-    io.emit('receive message', msg);
+    text = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    
+    if(text != null){
+      var msg = name + ' : ' + text;
+      console.log(msg);
+      io.emit('receive message', msg);
+    }
   });
 });
 
@@ -112,7 +116,7 @@ app.post('/signup', (req, res) => {
       const salt = uuidv4();
       crypto.pbkdf2(password, salt, 10000, 64, 'sha512', (err, key) => {
           if (err) {
-              res.status(500).json(err)
+            res.status(500).json(err)
           } else {
               console.log(key.toString("hex"))
               models.User.create({ hash_password: key.toString("hex"), salt, ...body }).then((r) => {
