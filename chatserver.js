@@ -15,13 +15,13 @@ sequelize.sync();
 //세션유지
 const session = require('express-session');
 const sharedsession = require('express-socket.io-session');
-const FileStore = require('session-file-store')(session);
+// const FileStore = require('session-file-store')(session);
 
 const sessionForSharing = session({
   secret: 'keyboard cat',
   resave: false,
-  saveUninitialized: true,
-  store: new FileStore()
+  saveUninitialized: true
+  // store: new FileStore()
 });
 
 
@@ -30,7 +30,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended : false}));
 app.use('/static', express.static(__dirname+'/static'));
 app.use(sessionForSharing);
-
 io.use(sharedsession(sessionForSharing, { autoSave: true}));
 
 // const myKey = "geocashgeocash"
@@ -47,9 +46,19 @@ app.get('/',function(req, res){
       }
     })
   } else {
-    res.redirect('/login')
+    res.redirect('/first_time')
   }
 });
+
+app.get('/first_time', function(req, res){
+  fs.readFile('./static/js/mainpage.html', function(err, data) {
+    if(err) {
+      res.send('에러')
+    } else {
+      res.sendFile(__dirname + '/static/js/mainpage.html')
+    }
+  })
+})
 
 //위와 마찬가지로 로그인 주소 접속
 app.get('/login',function(req, res){  //2
