@@ -30,6 +30,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended : false}));
 app.use('/static', express.static(__dirname+'/static'));
 app.use(sessionForSharing);
+
 io.use(sharedsession(sessionForSharing, { autoSave: true}));
 
 // const myKey = "geocashgeocash"
