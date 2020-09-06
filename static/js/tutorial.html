@@ -8,7 +8,8 @@
     <script type="text/javascript" src="/static/design_js/tutorial.js"></script>
 </head>
 <body>
-    <!-- <div class="MouseScroll">
+    <!-- 마우스 아이콘
+    <div class="MouseScroll">
         <svg viewBox="0 0 100 100">
             <g fill="white">
                 <path d="M40,41.0074017 L40,41.0074017 L40,58.9925983 C40,64.5218355 44.4762336,69 50,69 C55.5234877,69 60,64.5203508 60,58.9925983 L60,41.0074017 C60,35.4781645 55.5237664,31 50,31 C44.4765123,31 40,35.4796492 40,41.0074017 L40,41.0074017 Z M38,41.0074017 C38,34.3758969 43.3711258,29 50,29 C56.627417,29 62,34.3726755 62,41.0074017 L62,58.9925983 C62,65.6241031 56.6288742,71 50,71 C43.372583,71 38,65.6273245 38,58.9925983 L38,41.0074017 L38,41.0074017 Z"  class="MouseScroll--chevron"></path>
@@ -21,6 +22,7 @@
     <section id="section0">
         <h1>CHATERS</h1>
         <h2>깔끔한 디자인의 채팅사이트</h2>
+        
         <button class="next" onclick=hideParent();>다음</button>
     </section>
 
@@ -31,6 +33,9 @@
             Aspernatur dolorem ea molestiae, incidunt doloremque similique, quos voluptates, provident veritatis nulla eligendi ipsum dicta id eos magni praesentium. Et quos illum, harum veniam in nisi soluta fugit corrupti provident.
             Sint impedit atque nulla aut magnam eaque esse nostrum adipisci laborum ducimus blanditiis sed rerum fugiat, laboriosam fuga similique placeat aperiam. Illo totam nam quam culpa recusandae qui non laudantium!</p>
         </div>
+        
+        <button class="back" onclick=showParent();><</button>
+        <button class="next2" onclick=hideParent2();>></button>
     </section>
 
     <section id="section2">
@@ -40,14 +45,19 @@
             Aspernatur dolorem ea molestiae, incidunt doloremque similique, quos voluptates, provident veritatis nulla eligendi ipsum dicta id eos magni praesentium. Et quos illum, harum veniam in nisi soluta fugit corrupti provident.
             Sint impedit atque nulla aut magnam eaque esse nostrum adipisci laborum ducimus blanditiis sed rerum fugiat, laboriosam fuga similique placeat aperiam. Illo totam nam quam culpa recusandae qui non laudantium!</p>
         </div>
+        
+        <button class="back" onclick=showParent2();><</button>
+        <button class="next2" onclick=hideParent3();>></button>
     </section>
 
     <section id="section3">
         <div class="text3">
             <h2>만든 사람</h2>
             <p>이영석,김준서,나성민,김예찬</p>
+            <button class="signup" onClick="location.href='/signup'">CHATERS<br>시작하기</button>
         </div>
-        <a href="#" id="up" title="맨 위로">맨 위로</a>
+        
+        <button class="back" onclick=showParent3();><</button>
         
     </section>
 </body>
