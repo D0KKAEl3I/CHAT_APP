@@ -15,13 +15,13 @@ sequelize.sync();
 //세션유지
 const session = require('express-session');
 const sharedsession = require('express-socket.io-session');
-const FileStore = require('session-file-store')(session);
+// const FileStore = require('session-file-store')(session);
 
 const sessionForSharing = session({
   secret: 'keyboard cat',
   resave: false,
-  saveUninitialized: true,
-  store: new FileStore()
+  saveUninitialized: true
+  // store: new FileStore()
 });
 
 
@@ -30,7 +30,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended : false}));
 app.use('/static', express.static(__dirname+'/static'));
 app.use(sessionForSharing);
-
 io.use(sharedsession(sessionForSharing, { autoSave: true}));
 
 // const myKey = "geocashgeocash"
@@ -39,7 +38,7 @@ io.use(sharedsession(sessionForSharing, { autoSave: true}));
 app.get('/',function(req, res){ 
   if(req.session.logined){
     //파일 찾기, 없으면 에러 출력, 있으면 설정한 페이지 전송
-    fs.readFile('/static/js/chat.html', function(err, data) {
+    fs.readFile('./static/js/chat.html', function(err, data) {
       if(err) {
         res.send('에러')
       } else {
@@ -52,7 +51,7 @@ app.get('/',function(req, res){
 });
 
 app.get('/first_time', function(req, res){
-  fs.readFile('/static/js/mainpage.html', function(err, data) {
+  fs.readFile('./static/js/mainpage.html', function(err, data) {
     if(err) {
       res.send('에러')
     } else {
