@@ -4,12 +4,11 @@ body{
 }
 
 .logo{
-    height: 150px;
     position: absolute;
     text-align: center;
-    top: 40%;
+    top: 40%;  
     bottom: 40%;
-    left: 16%;
+    left: 16%;  
 }
 
 button.logoLetter{ 
@@ -21,6 +20,7 @@ button.logoLetter{
     background: none;
     outline: 0;
     cursor:pointer;
+    transition-delay: 1.3s;
     animation:intro 1.7s cubic-bezier(0.0, 0.0, 0.58, 1.0) forwards;
 }
 
@@ -38,15 +38,6 @@ div button:nth-child(6) { animation-delay: .5s; }
 div button:nth-child(7) { animation-delay: .6s; }
 div button:nth-child(8) { animation-delay: .7s; }
 
-h1{
-    text-shadow: rgb(156, 156, 156) 1px 0 5px;  
-    margin-top:80px;
-    color: white;
-    font-family: 'Gothic A1', sans-serif ;
-    font-size: 40px;
-    text-align: center;
-    animation:letter_spacing 2s, intro 1s 2s; 
-}
 
 div.q_block{
     display: inline-block;
@@ -72,18 +63,6 @@ div.q_block{
     margin-top: 10px;
 }
 
-@keyframes letter_spacing{
-    0%{
-        margin-top: 400px;
-        letter-spacing: 10px;
-        opacity: 0%;
-    }
-    100%{
-        margin-top: 400px;
-        letter-spacing: 0px;
-        opacity: 100%;
-    }
-}
 
 @keyframes intro {
     0%{
@@ -96,11 +75,9 @@ div.q_block{
 
 @keyframes zoomIn{
     from{
-        width: 173.5px;
-        height: 180.5px; 
+        
     }
     to{
-        width: 347px;
-        height: 361px; 
+        text-align: center; 
     }
 }
