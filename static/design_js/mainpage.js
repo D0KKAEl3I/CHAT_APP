@@ -30,7 +30,7 @@ function clicking(char) {
         ], {
             duration:600,
             easing:"cubic-bezier(0.0, 0.0, 0.3, 2)",
-            delay:1600,
+            delay:600,
             fill:"forwards"
         })
         toggle = !toggle        
