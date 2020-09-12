@@ -14,6 +14,7 @@ function clicking(char) {
                 fill:"forwards"
             })
         }
+
         var tar = document.getElementById(char)
         var tarLeft = tar.getBoundingClientRect().left;
         var abLeft = window.pageXOffset + tarLeft
@@ -26,7 +27,16 @@ function clicking(char) {
             delay:600,
             fill:"forwards"
         })
-        toggle = !toggle        
+        
+        var h2 = tar.getElementsByClassName('text');
+        for(var i in h2){
+            console.log(i);
+            // h2[i].animate([
+            //     // {transform:}
+            // ])
+        }
+
+        toggle = !toggle
     } else {
         var tar = document.getElementById(char)
         var tarLeft = tar.getBoundingClientRect().left;
