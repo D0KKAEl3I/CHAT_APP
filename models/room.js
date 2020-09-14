@@ -22,12 +22,8 @@ module.exports = (sequelize, DataTypes) => {
       code:{
           type:DataTypes.STRING(6),
           allowNull:false,
-          usique:true,
+          unique:true,
           default:makeid(6)
-      },
-      userinroom:{
-          type:DataTypes.STRING(20),
-          allowNull:false
       }
     }, {
       timestamps: true,

@@ -62,25 +62,17 @@ div button:nth-child(6) { animation-delay: .5s; }
 div button:nth-child(7) { animation-delay: .6s; }
 div button:nth-child(8) { animation-delay: .7s; }
 
-
-div.q_block{
-    display: inline-block;
-    background-color: white;
+div.block{
+    position: absolute;
+    top: 80%;
     width: 300px;
-    height: 300px;
-    border: 5px outset rgb(165, 165, 165);
+    height: 100px;
     text-align: center;
     border-radius: 15px;
 }
 
-#old>button{
-    width: 200px;
-    height: 100px;
-}
-
-#new>button{
-    width: 200px;
-    height: 70px;
+.q_block button{
+    
 }
 
 #toSignup{

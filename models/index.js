@@ -1,6 +1,6 @@
 'use strict';
 
-const Sequelize = require('sequelize');
+const Sequelize = require('sequelize'); 
 
 const wkx = require('wkx')
 Sequelize.GEOMETRY.prototype._stringify = function _stringify(value, options) {
@@ -32,10 +32,11 @@ db.Sequelize = Sequelize;
 
 db.User = require('./user')(sequelize, Sequelize);
 
-// db.Room = require('./room')(sequelize, Sequelize);
+db.Room = require('./room')(sequelize, Sequelize);
 
-// db.User.belongsToMany(db.Room, {through: 'UserRoom'});
-// db.Room.belongsToMany(db.User, {through: 'UserRoom'});
+db.User.belongsToMany(db.Room, {through: 'UserRoom'});
+db.Room.belongsToMany(db.User, {through: 'UserRoom'});
+
 
 // db.User.hasMany(db.Chat, {foreignKey: 'userId', sourceKey: 'id'});
 // db.Room.hasMany(db.Chat, {foreignKey: 'roomId', sourceKey: 'id'});

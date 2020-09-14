@@ -16,8 +16,9 @@
         <nav class = "Room">
             <ul>
                 <span class="Room">방 목록</span><br>
-                <li ><button id="Rooms">ldfs</button></li>
-                <li id="last_list"><button class="room" id="Rooms">ldfs</button></li>
+                  <% for(var i = 0; i < roomname.length; i++) { %>
+                    <button id="Rooms" onclick="join('<%= roomname[i] %>');" ><%= roomname[i] %></button>
+                  <% } %>
             </ul>
         </nav>
         <div id="chating">
@@ -33,7 +34,15 @@
     <script src="//code.jquery.com/jquery-1.11.1.js"></script>
     <script>
       var socket = io(); //1
+      function join(roomname){
+        console.log(roomname)
+      }
 
+      $('#Room button').on('click', function(e) {
+        socket.emit('join room', $('#Rooms').text());
+        console.log( $('#Rooms').text())
+        e.preventDefault();
+      });
       $('#chat').on('submit', function(e){ //2
         socket.emit('send message', $('#name').val(), $('#message').val());
         $('#message').val('');
@@ -46,6 +55,17 @@
       });
       socket.on('change name', function(name){ //4
         $('#name').val(name);
+      });
+
+
+      socket.on('leaveRoom', (num, name) => {
+      $('#messages').append($('<li>').text(name + '    leaved '
+        + room[num] + ' :('));
+      });
+
+      socket.on('joinRoom', (num, name) => {
+        $('#messages').append($('<li>').text(name + '    joined '
+        + room[num] + ':)'));
       });
     </script>
 </body>
