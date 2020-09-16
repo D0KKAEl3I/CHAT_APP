@@ -17,11 +17,12 @@
             <ul>
                 <span class="Room">방 목록</span><br>
                   <% for(var i = 0; i < roomname.length; i++) { %>
-                    <button id="Rooms" onclick="join('<%= roomname[i] %>');" ><%= roomname[i] %></button>
+                    <button class="Rooms" onclick="join('<%=roomname[i]%>')"><%= roomname[i] %></button>
                   <% } %>
             </ul>
         </nav>
         <div id="chating">
+            <h3 id="roomname"></h3>
             <textarea id="chatLog" class="chat_log" readonly></textarea>
         </div>
         <form id="chat">
@@ -34,15 +35,12 @@
     <script src="//code.jquery.com/jquery-1.11.1.js"></script>
     <script>
       var socket = io(); //1
+
       function join(roomname){
-        console.log(roomname)
+        socket.emit('leaveRoom', $('#roomname').val());
+        socket.emit('joinRoom', roomname, $('#name').val());
       }
 
-      $('#Room button').on('click', function(e) {
-        socket.emit('join room', $('#Rooms').text());
-        console.log( $('#Rooms').text())
-        e.preventDefault();
-      });
       $('#chat').on('submit', function(e){ //2
         socket.emit('send message', $('#name').val(), $('#message').val());
         $('#message').val('');
@@ -53,19 +51,21 @@
         $('#chatLog').append(msg+'\n');
         $('#chatLog').scrollTop($('#chatLog')[0].scrollHeight);
       });
+
       socket.on('change name', function(name){ //4
         $('#name').val(name);
       });
 
+      socket.on('leaveRoom', (roomname, name) => {
+      $('#chatLog').val('');
+      $('#messages').append($('#chatLog').text(name + ' leaved '
+        + roomname + ' :('));
+      }); 
 
-      socket.on('leaveRoom', (num, name) => {
-      $('#messages').append($('<li>').text(name + '    leaved '
-        + room[num] + ' :('));
-      });
-
-      socket.on('joinRoom', (num, name) => {
-        $('#messages').append($('<li>').text(name + '    joined '
-        + room[num] + ':)'));
+      socket.on('joinRoom', (roomname, name) => {
+        $('#roomname').val(`${roomname}`)
+        $('#messages').append($('#chatLog').text(name + ' joined '
+        + roomname + '\n'));
       });
     </script>
 </body>

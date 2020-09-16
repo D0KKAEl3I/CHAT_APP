@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
           type:DataTypes.STRING(6),
           allowNull:false,
           unique:true,
-          default:makeid(6)
+          defaultValue:makeid(6)
       }
     }, {
       timestamps: true,
