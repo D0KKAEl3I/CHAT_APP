@@ -1,5 +1,9 @@
+html{
+    overflow: hidden;
+}
 body{
     background-color: rgb(46, 46, 46);
+    margin: 7px;
 }
 
 #title{
@@ -58,7 +62,8 @@ a#log_in:hover{
 }
 
 button.Rooms{ 
-    width: 300px;
+    float: right;
+    width: 200px;
     font: bold;
     font-size: 25px;
     border: 0;
@@ -79,47 +84,39 @@ section{
 nav.Room{
     float: left;
     position: absolute;
-    background-color: rgba(121, 121, 121);
+    background-color: rgba(97, 97, 97);
     width: 20px;
-    height: 120px;
+    height: 92%;
     overflow: hidden;
-    opacity: 1;
-    transition:0.5s;
-}
-
-#hover{
-    opacity: 0;
-}
-
-#hover:hover{
-    opacity: 1;
-    transition:0.7s;
+    transition:0.6s;
 }
 
 nav.Room:hover{
     float: left;
     position: absolute;
-    background-color: rgba(121, 121, 121);
+    background-color: rgb(112, 112, 112);
     width: 300px;
-    height: 120px;
     overflow: hidden;
 }
 
 ul{
+    opacity: 0;
+    margin: 0;
     list-style: none;
     float: right;
-    width: 90%;
+    width: 100%;
     height: 100%;
+    transition:0.4s;
+
+}
+
+ul:hover{
+    transition-delay: 0.2s;
+    opacity: 1;
+    
 }
 
 span.Room{
-    float: right;
-    right: 200px;
-    font-size: 20px;   
-    font-weight: 1000;
-}
-span.Room:hover{
-    float: right;
     right: 200px;
     font-size: 20px;   
     font-weight: 1000;
