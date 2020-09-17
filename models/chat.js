@@ -1,7 +1,8 @@
 module.exports = (sequelize, DataTypes) => {
     return sequelize.define('chat', {
       context:{
-        allowNull:false,
+        type:DataTypes.TEXT(),
+        allowNull:false
       }
     }, {
       timestamps: true,

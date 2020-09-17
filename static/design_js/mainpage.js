@@ -28,13 +28,8 @@ function clicking(char) {
             fill:"forwards"
         })
         
-        var h2 = tar.getElementsByClassName('text');
-        for(var i in h2){
-            console.log(i);
-            // h2[i].animate([
-            //     // {transform:}
-            // ])
-        }
+        var h2 = document.getElementsByClassName('text');
+        
 
         toggle = !toggle
     } else {

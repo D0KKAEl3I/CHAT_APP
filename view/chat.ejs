@@ -14,7 +14,7 @@
     </div>
     <section>
         <nav class = "Room">
-            <ul>
+            <ul id="hover">
                 <span class="Room">방 목록</span><br>
                   <% for(var i = 0; i < roomname.length; i++) { %>
                     <button class="Rooms" onclick="join('<%=roomname[i]%>')"><%= roomname[i] %></button>
@@ -24,12 +24,12 @@
         <div id="chating">
             <h3 id="roomname"></h3>
             <textarea id="chatLog" class="chat_log" readonly></textarea>
+            <form id="chat">
+                <input id="name" class="name" type="text" readonly>
+                <input id="message" class="message" type="text" autocomplete="off">
+                <input type="submit" class="chat" value="chat"/>
+            </form>
         </div>
-        <form id="chat">
-            <input id="name" class="name" type="text" readonly>
-            <input id="message" class="message" type="text" autocomplete="off">
-            <input type="submit" class="chat" value="chat"/>
-        </form>
     </section>
     <script src="/socket.io/socket.io.js"></script> <!-- 1 -->
     <script src="//code.jquery.com/jquery-1.11.1.js"></script>
