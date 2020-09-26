@@ -19,12 +19,16 @@ module.exports = (sequelize, DataTypes) => {
           type:DataTypes.STRING(20),
           allowNull: true
       },
+      maker:{
+          type:DataTypes.STRING(20),
+          allowNull:false
+      },
       code:{
           type:DataTypes.STRING(6),
           allowNull:false,
           unique:true,
           defaultValue:makeid(6)
-      }
+      }      
     }, {
       timestamps: true,
     });

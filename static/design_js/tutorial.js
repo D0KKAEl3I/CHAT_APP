@@ -1,20 +1,29 @@
-function hideParent(){
-    document.getElementById("section0").style.display ='none';
-}
-function hideParent2(){
-    document.getElementById("section1").style.display ='none';
-}
-function hideParent3(){
-    document.getElementById("section2").style.display ='none';
+function toNext(num){
+    hideAnima(num);
 }
 
+function toBack(num){
+    showAnima(num)
+}
 
-function showParent(){
-    document.getElementById("section0").style.display ='table';
-}
-function showParent2(){
-    document.getElementById("section1").style.display ='table';
-}
-function showParent3(){
-    document.getElementById("section2").style.display ='table';
+function hideAnima(num){   
+    target = document.getElementById(`section${num}`)
+    target.animate([ 
+        {transform: 'translate(-3000px,0)'}
+    ], {
+        duration: 300,
+        easing: "cubic-bezier(0.3, 0.6, 0.8, 1)",
+        fill:"forwards"
+    });
+}  
+
+function showAnima(num){   
+    document.getElementById(`section${num}`).animate([ 
+        {transform: 'translate(0px,0)'}
+    ], {
+        duration: 300,
+        easing: "cubic-bezier(0.3, 0.6, 0.8, 1)",
+        fill:"forwards"
+    })
+    console.log(1)
 }

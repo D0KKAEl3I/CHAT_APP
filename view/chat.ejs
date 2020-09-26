@@ -5,32 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chaters</title>
     <link type="text/css" rel="stylesheet" href="./static/css/chat.css">
+    <script type="text/javascript" src="/static/design_js/chat.js"></script>
 </head>
 <body>
     <div id="title">
       <h1 class="CHATERS" >CHATERS</h1>
-        <a href="/signup" class="header" id="sign_up">회원가입</a>
-        <a href="/login" class="header" id="log_in">로그인</a>
+        <!-- <a href="/signup" class="header" id="sign_up">회원가입</a> -->
+        <!-- <a href="/login" class="header" id="log_in">로그인</a> -->
     </div>
+
+    <nav class = "Room">
+        <ul id="hover">
+            <span class="Room">방 목록</span>
+            <button id="makeRoom" onclick="filtering(0)">+</button>
+              <% for(var i = 0; i < roomname.length; i++) { %>
+                <button class="Rooms" onclick="join('<%=roomname[i]%>')"><%= roomname[i] %></button>
+              <% } %>
+        </ul>
+    </nav>
+
+    <div id="filter2">
+      <div id="making">
+        <button id="close" onclick="filtering(1)">x</button>
+        <form action="/makeRoom" method="POST">
+          <input class="roomInput" type="text" name="roomname" placeholder="방 이름"><br>
+          <input class="roomInput" type="text" name="password" placeholder="비밀번호"><br>
+          <input type="submit" id="submit" value="방 생성" />
+        </form>
+      </div> 
+    </div>
+
     <section>
-        <nav class = "Room">
-            <ul id="hover">
-                <span class="Room">방 목록</span><br>
-                  <% for(var i = 0; i < roomname.length; i++) { %>
-                    <button class="Rooms" onclick="join('<%=roomname[i]%>')"><%= roomname[i] %></button>
-                  <% } %>
-            </ul>
-        </nav>
-        <div id="chating">
-            <h3 id="roomname"></h3>
-            <textarea id="chatLog" class="chat_log" readonly></textarea>
-            <form id="chat">
-                <input id="name" class="name" type="text" readonly>
-                <input id="message" class="message" type="text" autocomplete="off">
-                <input type="submit" class="chat" value="chat"/>
-            </form>
-        </div>
+      <div id="chating">
+        <h3 id="roomname"></h3>
+        <textarea id="chatLog" class="chat_log" readonly></textarea>
+        <form id="chat">
+          <input id="r-name" type="text">
+          <input id="password" type="text" autocomplete="off">
+          <input type="submit" value="chat" />
+        </form>
+      </div>
     </section>
+
     <script src="/socket.io/socket.io.js"></script> <!-- 1 -->
     <script src="//code.jquery.com/jquery-1.11.1.js"></script>
     <script>
