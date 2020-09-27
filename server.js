@@ -1,0 +1,238 @@
+//기본
+const fs = require('fs')
+const express = require('express');
+const app = express();
+//데이터베이스
+const mysql = require('mysql2');
+const database = mysql.createConnection({
+  host: '127.0.0.1',
+  port: 3306,
+  user: 'root',
+  password: 'root',
+  database: 'go-cahce',
+  connectionLimit: 3
+})
+
+const db = database.promise();
+
+//챗
+const http = require('http').Server(app); //1
+var io = require('socket.io')(http);    //1
+//계정
+const bodyParser = require('body-parser');
+const crypto = require('crypto');
+const { v4: uuidv4 } = require('uuid');
+const models = require('./models');
+const sequelize = require('./models').sequelize;
+sequelize.sync();
+//세션유지
+const session = require('express-session');
+const sharedsession = require('express-socket.io-session');
+const { where } = require('sequelize');
+const { condition } = require('sequelize');
+
+const sessionForSharing = session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: true
+});
+
+app.set('views', __dirname + '/view'); // views 폴더에서 ejs 템플릿을 가져오게 설정
+app.set('view engine', 'ejs');          // 템플릿 엔진을 ejs로 설정
+
+app.use(express.json());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use('/static', express.static(require('path').join(__dirname, '/static')));
+app.use(sessionForSharing);
+
+io.use(sharedsession(sessionForSharing, { autoSave: true }));
+
+// const myKey = "geocashgeocash"
+
+//사이트 접속
+app.get('/', async function (req, res) {
+  if (req.session.logined) {
+    var [results1] = await db.query(`SELECT id FROM Users WHERE username="${req.session.username}";`)
+    console.log(results1[0].id)
+    var userid = results1[0].id;
+
+    // var [results2] = await db.query(`SELECT roomId FROM UserRooms WHERE userId="${userid}";`)
+    // console.log(results2[0].roomId)
+    // var roomIds = []
+    // for (var i in results2) {
+    //   roomIds.push(`${results2[i].roomId}`)
+    // }
+
+    // var [results3] = await db.query(`SELECT roomname FROM Rooms WHERE roomId="${roomid};`, function() {
+    //   var roomnames = [];
+    //     for (var i in results) {
+    //       roomnames.push(`${results[i].roomname}`)
+    //     }
+    //     res.render('chat', { roomname: roomnames })
+    // })
+    var [results3] = await db.query(`SELECT roomname FROM Rooms`)
+
+    var roomnames = [];
+    for (var i in results3) {
+      roomnames.push(`${results3[i].roomname}`)
+    }
+    res.render('chat', { roomname: roomnames })
+
+  } else {
+    res.redirect('/first_time')
+  }
+});
+
+app.get('/first_time', function (req, res) {
+  fs.readFile('./static/js/mainpage.html', function (err, data) {
+    if (err) {
+      res.send('에러')
+    } else {
+      res.sendFile(__dirname + '/static/js/mainpage.html')
+    }
+  })
+})
+
+//위와 마찬가지로 로그인 주소 접속
+app.get('/login', function (req, res) {  //2
+  fs.readFile('./static/js/login.html', function (err, data) {
+    if (err) {
+      res.send('에러')
+    } else {
+      res.sendFile(__dirname + '/static/js/login.html')
+    }
+  })
+});
+
+//회원가입 주소 접속
+app.get('/signup', function (req, res) {  //2
+  fs.readFile('./static/js/signup.html', function (err, data) {
+    if (err) {
+      res.send('에러')
+    } else {
+      res.sendFile(__dirname + '/static/js/signup.html')
+    }
+  })
+});
+
+//튜토리얼 주소 접속
+app.get('/tuto', function (req, res) {  //2
+  fs.readFile('./static/js/tutorial.html', function (err, data) {
+    if (err) {
+      res.send('에러')
+    } else {
+      res.sendFile(__dirname + '/static/js/tutorial.html')
+    }
+  })
+});
+
+//챗관련 파트
+io.on('connection', function (socket) { //3
+  console.log('user connected: ', socket.id);  //3-1
+
+  socket.on('joinRoom', (roomname, name) => {
+    socket.join(roomname, function () {
+      io.to(roomname).emit('joinRoom', roomname, name);
+      console.log(name + ' join a ' + roomname);
+    });
+  });
+
+  socket.on('leaveRoom', (roomname, name) => {
+    socket.leave(roomname, function () {
+      io.to(roomname).emit('leaveRoom', roomname, name);
+      console.log(name + ' leave a ' + roomname);
+    });
+  });
+
+  var name = socket.handshake.session.username//3-1
+  io.to(socket.id).emit('change name', name);   //3-1
+
+  socket.on('disconnect', function () { //3-2
+    console.log('user disconnected: ', socket.id);
+  });
+
+  socket.on('send message', function (name, text) { //3-3
+    text = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    text = text.toString();
+    if (text != null) {
+      var msg = name + ' : ' + text;
+      console.log(msg);
+      io.emit('receive message', msg);
+    }
+  });
+});
+
+//회원가입
+app.post('/signup', function (req, res) {
+  const { password, ...body } = req.body;
+
+  if (password.length < 8) {
+    res.status(500).json({ error: "비밀번호는 최소 8자 이상이어야 합니다." })
+  } else {
+    const salt = uuidv4();
+    crypto.pbkdf2(password, salt, 10000, 64, 'sha512', (err, key) => {
+      if (err) {
+        res.status(500).json(err)
+      } else {
+        console.log(key.toString("hex"))
+        models.User.create({ hash_password: key.toString("hex"), salt, ...body }).then((r) => {
+          // alert("회원가입이 정상적으로 처리되었습니다.");
+          res.redirect('/login')
+        }).catch(e => {
+          res.status(500).json(e);
+        })
+      }
+    })
+  }
+})
+
+app.post('/login', function (req, res) {
+  models.User.findOne({ where: { username: req.body.username } }).then((r) => {
+
+    //있을경우  
+    if (r) {
+      // 조회된 username이 가진 암호화된 비밀번호가 당시와 같은 방법으로 암호화를 돌릴시 일치하는지 판정
+      if (r.hash_password == crypto.pbkdf2Sync(req.body.password, r.salt, 10000, 64, 'sha512').toString('hex')) {
+        //비밀번호 맞으면
+        req.session.logined = true;
+        req.session.username = req.body.username;
+        res.redirect('/');
+      } else {
+        //비밀번호 틀릴시
+        res.status(401)
+        alert("비밀번호 틀림")
+      }
+    } else {
+      //아이디가 틀릴시
+      res.status(404).json({ error: "사용자를 찾을 수 없습니다." })
+    }
+  })
+})
+
+app.post('/makeRoom', function (req, res) {
+  var { roomname, password, ...body } = req.body;
+  var maker = req.session.username;
+
+  models.Room.create({ roomname, password, maker }).then(async (r) => {
+
+    var [results1] = await db.query(`SELECT id FROM Users WHERE username="${maker}";`)
+    var userid = results1[0].id;
+
+    var [results2] = await db.query(`SELECT id FROM Rooms WHERE roomname="${roomname}";`)
+    var roomid = results2[0].id;
+
+    await db.query(`INSERT INTO UserRooms (userId, roomId) VALUES (${userid},${roomid});`)
+
+    res.redirect('/');
+  })
+})
+
+
+// app.listen(3000, () =>{
+//   console.log("Start main server")
+// })
+//챗 서버
+http.listen(3000, function () { //4
+  console.log('chating server on!');
+});
