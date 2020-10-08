@@ -39,7 +39,7 @@ db.Room = require('./room')(sequelize, Sequelize);
 db.User.belongsToMany(db.Room, {through: 'UserRoom'});
 db.Room.belongsToMany(db.User, {through: 'UserRoom'});
 
-const UserRoom = sequelize.define('UserRoom', {}, { timestamps: false });
+const UserRoom = sequelize.define('UserRoom', {}, {timestamps: false });
 db.User.belongsToMany(db.Room, {through: UserRoom});
 db.Room.belongsToMany(db.User, {through: UserRoom});
   

@@ -1,88 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chaters</title>
-    <link type="text/css" rel="stylesheet" href="./static/css/chat.css">
-    <script type="text/javascript" src="/static/design_js/chat.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chaters</title>
+  <link type="text/css" rel="stylesheet" href="/static/css/chat.css">
+  
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script type="text/javascript" src="/static/design_js/chat.js"></script>
 </head>
+
 <body>
-    <div id="title">
-      <h1 class="CHATERS" >CHATERS</h1>
-        <!-- <a href="/signup" class="header" id="sign_up">회원가입</a> -->
-        <!-- <a href="/login" class="header" id="log_in">로그인</a> -->
-    </div>
+  <div id="title">
+    <h1 class="CHATERS">CHATERS</h1>
+    <!-- <a href="/signup" class="header" id="sign_up">회원가입</a> -->
+    <!-- <a href="/login" class="header" id="log_in">로그인</a> -->
+  </div>
 
-    <nav class = "Room">
-        <ul id="hover">
-            <span class="Room">방 목록</span>
-            <button id="makeRoom" onclick="filtering(0)">+</button>
-              <% for(var i = 0; i < roomname.length; i++) { %>
-                <button class="Rooms" onclick="join('<%=roomname[i]%>')"><%= roomname[i] %></button>
-              <% } %>
-        </ul>
-    </nav>
+  <nav class="Room">
+    <ul id="hover">
+      <span class="Room">방 목록</span>
+      <% for(var i = 0; i < roomname.length; i++) { %>
+      <button class="Rooms" onclick="join('<%=roomname[i]%>')"><%= roomname[i] %></button>
+      <% } %>
+      
+      <button id="showRoomTab">+</button>
+    </ul>
+  </nav>
 
-    <div id="filter2">
-      <div id="making">
-        <button id="close" onclick="filtering(1)">x</button>
+  <div id="filter"></div>
+
+  <!-- 방 관련 탭 -->
+  <div id="roomTabBG">
+
+    <!-- 방 생성/참가 -->
+    <div id="roomTab">
+      
+      <!-- 방 생성 -->
+      <div class="tabs" id="makingTab"> 
+        <button class="return" id="returnMK">o</button>
         <form action="/makeRoom" method="POST">
           <input class="roomInput" type="text" name="roomname" placeholder="방 이름"><br>
           <input class="roomInput" type="text" name="password" placeholder="비밀번호"><br>
-          <input type="submit" id="submit" value="방 생성" />
-        </form>
-      </div> 
-    </div>
-
-    <section>
-      <div id="chating">
-        <h3 id="roomname"></h3>
-        <textarea id="chatLog" class="chat_log" readonly></textarea>
-        <form id="chat">
-          <input id="name" type="text">
-          <input id="message" type="text" autocomplete="off">
-          <input type="submit" value="send" />
+          <input type="submit" class="submitButton" value="방 생성" />
         </form>
       </div>
-    </section>
+      
+      <!-- 방 참가 -->
+      <div class="tabs" id="joinTab">
+        <button class="return" id="returnJN">o</button>
+        <form action="/joinRoom" method="POST">
+          <input class="roomInput" type="text" name="roomname" placeholder="방 이름"><br>
+          <input class="roomInput" type="text" name="password" placeholder="비밀번호"><br>
+          <input type="submit" class="submitButton" value="방 참가" />
+        </form>
+      </div>
+      
+      <button id="close">x</button>
+  
+      <button class="toButton" id="toMake">방 만들기</button>
+  
+      <button class="toButton" id="toJoin">방 참가하기</button>
+    </div>
+  </div>
 
-    <script src="/socket.io/socket.io.js"></script> <!-- 1 -->
-    <script src="//code.jquery.com/jquery-1.11.1.js"></script>
-    <script>
-      var socket = io(); //1
+  <section>
+    <div id="chating">
+      <h3 id="roomname">방 이름</h3>
+      <ul id="chatLog">
+        
+      </ul>
+      <form id="chat">
+        <input id="message" type="text" autocomplete="off">
+        
+        <input type="submit" value="send"/>
+      </form>
+    </div>
+  </section>
+  
+  <p id="name" style="display: none;"></p>
+  
+  <script src="/socket.io/socket.io.js"></script> <!-- 1 -->
+  <script src="//code.jquery.com/jquery-1.11.1.js"></script>
+  <script>
+    var socket = io();
 
-      function join(roomname){
-        socket.emit('leaveRoom', $('#roomname').val());
-        socket.emit('joinRoom', roomname, $('#name').val());
-      }
+    function join(roomname) {
+      socket.emit('leaveRoom', $('#roomname').val());
+      socket.emit('joinRoom', roomname);
+    }
 
-      $('#chat').on('submit', function(e){ //2
+    $('#chat').on('submit', function (e) { //2
+      if($('#message').val() != ''){
         socket.emit('send message', $('#name').val(), $('#message').val());
         $('#message').val('');
         $('#message').focus();
-        e.preventDefault();
-      });
-      socket.on('receive message', function(msg){ //3
-        $('#chatLog').append(msg+'\n');
-        $('#chatLog').scrollTop($('#chatLog')[0].scrollHeight);
-      });
+      }
+      e.preventDefault();
+    });
+    socket.on('receive message', function (msg) { //3
+      $('#chatLog').append(`<li id="msg">${msg}</li>`);
+      $('#chatLog').scrollTop($('#chatLog')[0].scrollHeight);
+    });
 
-      socket.on('change name', function(name){ //4
-        $('#name').val(name);
-      });
+    socket.on('change name', function (name) { //4
+      $('#name').val(name);
+    });
 
-      socket.on('leaveRoom', (roomname, name) => {
+    socket.on('leaveRoom', (roomname, name) => {
       $('#chatLog').val('');
       $('#messages').append($('#chatLog').text(name + ' leaved '
         + roomname + ' :('));
-      }); 
+    });
 
-      socket.on('joinRoom', (roomname, name) => {
-        $('#roomname').val(`${roomname}`)
-        $('#messages').append($('#chatLog').text(name + ' joined '
+    socket.on('joinRoom', (roomname, name) => {
+      $('#roomname').val(`${roomname}`)
+      $('#messages').append($('#chatLog').text(name + ' joined '
         + roomname + '\n'));
-      });
-    </script>
+    });
+  </script>
 </body>
+
 </html>

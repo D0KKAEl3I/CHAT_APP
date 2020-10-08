@@ -53,32 +53,25 @@ io.use(sharedsession(sessionForSharing, { autoSave: true }));
 //사이트 접속
 app.get('/', async function (req, res) {
   if (req.session.logined) {
-    var [results1] = await db.query(`SELECT id FROM Users WHERE username="${req.session.username}";`)
-    console.log(results1[0].id)
-    var userid = results1[0].id;
+    var [userIdFromUser] = await db.query(`SELECT id FROM Users WHERE username="${req.session.username}";`)
+    var userid = userIdFromUser[0].id;
 
-    // var [results2] = await db.query(`SELECT roomId FROM UserRooms WHERE userId="${userid}";`)
-    // console.log(results2[0].roomId)
-    // var roomIds = []
-    // for (var i in results2) {
-    //   roomIds.push(`${results2[i].roomId}`)
-    // }
+    var [roomIdFromUserRoom] = await db.query(`SELECT roomId FROM UserRooms WHERE userId="${userid}";`)
 
-    // var [results3] = await db.query(`SELECT roomname FROM Rooms WHERE roomId="${roomid};`, function() {
-    //   var roomnames = [];
-    //     for (var i in results) {
-    //       roomnames.push(`${results[i].roomname}`)
-    //     }
-    //     res.render('chat', { roomname: roomnames })
-    // })
-    var [results3] = await db.query(`SELECT roomname FROM Rooms`)
-
-    var roomnames = [];
-    for (var i in results3) {
-      roomnames.push(`${results3[i].roomname}`)
+    var roomIds = []
+    for (var i in roomIdFromUserRoom) {
+      roomIds.push(`${roomIdFromUserRoom[i].roomId}`)
     }
-    res.render('chat', { roomname: roomnames })
-
+    if(roomIds.length==0) res.render('chat', {roomname:[]})
+    else{
+      var [roomnameFromRoom] = await db.query(`SELECT roomname FROM Rooms WHERE id IN (${roomIds});`)
+      var roomnames = [];
+      for (var i in roomnameFromRoom) {
+        roomnames.push(`${roomnameFromRoom[i].roomname}`)
+      }
+      console.log(roomnames)
+      res.render('chat', { roomname: roomnames })
+    }
   } else {
     res.redirect('/first_time')
   }
@@ -145,8 +138,8 @@ io.on('connection', function (socket) { //3
     });
   });
 
-  var name = socket.handshake.session.username//3-1
-  io.to(socket.id).emit('change name', name);   //3-1
+  console.log(socket.handshake.session.username)
+  io.to(socket.id).emit('change name', socket.handshake.session.username);
 
   socket.on('disconnect', function () { //3-2
     console.log('user disconnected: ', socket.id);
@@ -155,11 +148,9 @@ io.on('connection', function (socket) { //3
   socket.on('send message', function (name, text) { //3-3
     text = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
     text = text.toString();
-    if (text != null) {
-      var msg = name + ' : ' + text;
-      console.log(msg);
-      io.emit('receive message', msg);
-    }
+    var msg = name + ' : ' + text;
+    console.log(msg);
+    io.emit('receive message', msg);
   });
 });
 
@@ -200,12 +191,11 @@ app.post('/login', function (req, res) {
         res.redirect('/');
       } else {
         //비밀번호 틀릴시
-        res.status(401)
-        alert("비밀번호 틀림")
+        res.send("<script>alert('비밀번호 틀림')</script>").redirect('/login')
       }
     } else {
       //아이디가 틀릴시
-      res.status(404).json({ error: "사용자를 찾을 수 없습니다." })
+      res.send("<script>alert('사용자를 찾을수 없음')</script>").redirect('/login')
     }
   })
 })
@@ -216,16 +206,33 @@ app.post('/makeRoom', function (req, res) {
 
   models.Room.create({ roomname, password, maker }).then(async (r) => {
 
-    var [results1] = await db.query(`SELECT id FROM Users WHERE username="${maker}";`)
-    var userid = results1[0].id;
+    var [idFromUser] = await db.query(`SELECT id FROM Users WHERE username="${maker}";`)
+    var userid = idFromUser[0].id;
 
-    var [results2] = await db.query(`SELECT id FROM Rooms WHERE roomname="${roomname}";`)
-    var roomid = results2[0].id;
+    var [idFromRoom] = await db.query(`SELECT id FROM Rooms WHERE roomname="${roomname}";`)
+    var roomid = idFromRoom[0].id;
 
     await db.query(`INSERT INTO UserRooms (userId, roomId) VALUES (${userid},${roomid});`)
-
     res.redirect('/');
   })
+})
+
+app.post('/joinRoom', async function (req, res) {
+  var { roomname, password, ...body } = req.body; 
+
+  var [idFromUser] = await db.query(`SELECT id FROM Users WHERE username="${req.session.username}";`)
+  var userid = idFromUser[0].id;
+
+  var [idFromRoom] = await db.query(`SELECT id FROM Rooms WHERE roomname="${roomname}";`)
+  var roomid = idFromRoom[0].id;
+
+  var [PWofRoom] = await db.query(`SELECT password FROM Rooms WHERE roomname="${roomname}";`)
+  if (password == PWofRoom) {
+    await db.query(`INSERT INTO UserRooms (userId, roomId) VALUES (${userid},${roomid});`)
+  } else {
+    res.send("<script>alert('방이 존재하지 않거나 비밀번호 틀림')</script>").redirect('/')
+  }
+  res.redirect('/');
 })
 
 
