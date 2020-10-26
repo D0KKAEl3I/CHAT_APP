@@ -30,6 +30,7 @@ const session = require('express-session');
 const sharedsession = require('express-socket.io-session');
 const { where } = require('sequelize');
 const { condition } = require('sequelize');
+const { Room } = require('./models');
 
 const sessionForSharing = session({
   secret: 'keyboard cat',
@@ -53,25 +54,21 @@ io.use(sharedsession(sessionForSharing, { autoSave: true }));
 //사이트 접속
 app.get('/', async function (req, res) {
   if (req.session.logined) {
-    var [userIdFromUser] = await db.query(`SELECT id FROM Users WHERE username="${req.session.username}";`)
-    var userid = userIdFromUser[0].id;
-
-    var [roomIdFromUserRoom] = await db.query(`SELECT roomId FROM UserRooms WHERE userId="${userid}";`)
-
-    var roomIds = []
-    for (var i in roomIdFromUserRoom) {
-      roomIds.push(`${roomIdFromUserRoom[i].roomId}`)
-    }
-    if(roomIds.length==0) res.render('chat', {roomname:[]})
-    else{
-      var [roomnameFromRoom] = await db.query(`SELECT roomname FROM Rooms WHERE id IN (${roomIds});`)
-      var roomnames = [];
-      for (var i in roomnameFromRoom) {
-        roomnames.push(`${roomnameFromRoom[i].roomname}`)
+    await models.User.findOne({ 
+      where: { 
+        username: req.session.username 
+      },
+      include: {
+        model: models.Room,
+        through: {
+          attributes: [],
+          model: models.UserRoom
+        }
       }
-      console.log(roomnames)
-      res.render('chat', { roomname: roomnames })
-    }
+    }).then((r)=>{
+      res.render('chat', {roomname:r ? r.rooms.map(item=>item.roomname) : []})
+    })
+
   } else {
     res.redirect('/first_time')
   }
@@ -187,7 +184,8 @@ app.post('/login', function (req, res) {
       if (r.hash_password == crypto.pbkdf2Sync(req.body.password, r.salt, 10000, 64, 'sha512').toString('hex')) {
         //비밀번호 맞으면
         req.session.logined = true;
-        req.session.username = req.body.username;
+        req.session.username = r.username;
+        req.session.userId = r.id
         res.redirect('/');
       } else {
         //비밀번호 틀릴시
@@ -200,39 +198,29 @@ app.post('/login', function (req, res) {
   })
 })
 
-app.post('/makeRoom', function (req, res) {
-  var { roomname, password, ...body } = req.body;
-  var maker = req.session.username;
+app.post('/makeRoom', async (req, res) => {
+    var { roomname, password, ...body } = req.body;
+    var maker = req.session.username;
 
-  models.Room.create({ roomname, password, maker }).then(async (r) => {
 
-    var [idFromUser] = await db.query(`SELECT id FROM Users WHERE username="${maker}";`)
-    var userid = idFromUser[0].id;
-
-    var [idFromRoom] = await db.query(`SELECT id FROM Rooms WHERE roomname="${roomname}";`)
-    var roomid = idFromRoom[0].id;
-
-    await db.query(`INSERT INTO UserRooms (userId, roomId) VALUES (${userid},${roomid});`)
-    res.redirect('/');
+    var room = await models.Room.create({ roomname, password, maker });
+    await room.addUser(req.session.userId);
+    res.redirect('/')
   })
-})
+
+
 
 app.post('/joinRoom', async function (req, res) {
   var { roomname, password, ...body } = req.body; 
-
-  var [idFromUser] = await db.query(`SELECT id FROM Users WHERE username="${req.session.username}";`)
-  var userid = idFromUser[0].id;
-
-  var [idFromRoom] = await db.query(`SELECT id FROM Rooms WHERE roomname="${roomname}";`)
-  var roomid = idFromRoom[0].id;
-
-  var [PWofRoom] = await db.query(`SELECT password FROM Rooms WHERE roomname="${roomname}";`)
-  if (password == PWofRoom) {
-    await db.query(`INSERT INTO UserRooms (userId, roomId) VALUES (${userid},${roomid});`)
+  var room = await models.Room.findOne({where:{ roomname, password }});
+  if(room){
+    await room.addUser(req.session.userId);
+    res.redirect('/');
   } else {
-    res.send("<script>alert('방이 존재하지 않거나 비밀번호 틀림')</script>").redirect('/')
+    res.send("<script>alert('방이 존재하지 않거나 비밀번호 틀림'); </script>").redirect('/')
   }
-  res.redirect('/');
+
+ 
 })
 
 

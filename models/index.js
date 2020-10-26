@@ -34,14 +34,20 @@ db.User = require('./user')(sequelize, Sequelize);
 
 db.Room = require('./room')(sequelize, Sequelize);
 
+db.UserRoom = require('./userroom')(sequelize, Sequelize);
 // db.Chat = require('./chat')(sequelize, Sequelize)
 
-db.User.belongsToMany(db.Room, {through: 'UserRoom'});
-db.Room.belongsToMany(db.User, {through: 'UserRoom'});
+db.User.belongsToMany(db.Room, {through: db.UserRoom ,foreignKey:'roomId'});
+db.Room.belongsToMany(db.User, {through: db.UserRoom ,foreignKey:'userId'});
 
-const UserRoom = sequelize.define('UserRoom', {}, {timestamps: false });
-db.User.belongsToMany(db.Room, {through: UserRoom});
-db.Room.belongsToMany(db.User, {through: UserRoom});
+db.UserRoom.associate = function(db) {
+  db.UserRoom.belongsTo(db.User, {
+  foreignKey: 'userId'
+});
+  db.UserRoom.belongsTo(db.Room, {
+  foreignKey: 'roomId'
+  })
+};
   
 // db.User.hasMany(db.Chat, {foreignKey: 'userId', sourceKey: 'id'});
 // db.Room.hasMany(db.Chat, {foreignKey: 'roomId', sourceKey: 'id'});

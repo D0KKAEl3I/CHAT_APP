@@ -87,8 +87,10 @@
     var socket = io();
 
     function join(roomname) {
-      socket.emit('leaveRoom', $('#roomname').val());
-      socket.emit('joinRoom', roomname);
+      name = $('#name').val()
+      room = $('#roomname').val()
+      socket.emit('leaveRoom', {room, name});
+      socket.emit('joinRoom', {roomname, name});
     }
 
     $('#chat').on('submit', function (e) { //2
@@ -108,13 +110,13 @@
       $('#name').val(name);
     });
 
-    socket.on('leaveRoom', (roomname, name) => {
+    socket.on('leaveRoom', ({roomname, name}) => {
       $('#chatLog').val('');
       $('#messages').append($('#chatLog').text(name + ' leaved '
         + roomname + ' :('));
     });
 
-    socket.on('joinRoom', (roomname, name) => {
+    socket.on('joinRoom', ({roomname, name}) => {
       $('#roomname').val(`${roomname}`)
       $('#messages').append($('#chatLog').text(name + ' joined '
         + roomname + '\n'));
