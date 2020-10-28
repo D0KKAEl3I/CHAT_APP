@@ -57,7 +57,7 @@
         </form>
       </div>
       
-      <button id="close">x</button>
+      <button id="close">x</button> 
   
       <button class="toButton" id="toMake">방 만들기</button>
   
@@ -68,13 +68,12 @@
   <section>
     <div id="chating">
       <h3 id="roomname">방 이름</h3>
-      <ul id="chatLog">
+      <div id="chatLog">
         
-      </ul>
+      </div>
       <form id="chat">
         <input id="message" type="text" autocomplete="off">
-        
-        <input type="submit" value="send"/>
+        <input type="submit" value="send" style="display: none;"/>
       </form>
     </div>
   </section>
@@ -87,22 +86,24 @@
     var socket = io();
 
     function join(roomname) {
-      name = $('#name').val()
-      room = $('#roomname').val()
-      socket.emit('leaveRoom', {room, name});
+      var name = $('#name').val()
+      var beforeRoom = $('#roomname').val()
+      socket.emit('leaveRoom', {beforeRoom, name});
       socket.emit('joinRoom', {roomname, name});
     }
 
     $('#chat').on('submit', function (e) { //2
       if($('#message').val() != ''){
-        socket.emit('send message', $('#name').val(), $('#message').val());
+        socket.emit('send message', $('#roomname').val(), $('#name').val(), $('#message').val());
         $('#message').val('');
         $('#message').focus();
       }
       e.preventDefault();
     });
+
     socket.on('receive message', function (msg) { //3
-      $('#chatLog').append(`<li id="msg">${msg}</li>`);
+      console.log(msg)
+      $('#chatLog').append(`<p class="msg">${msg}</p>`);
       $('#chatLog').scrollTop($('#chatLog')[0].scrollHeight);
     });
 

@@ -121,33 +121,41 @@ app.get('/tuto', function (req, res) {  //2
 io.on('connection', function (socket) { //3
   console.log('user connected: ', socket.id);  //3-1
 
+  function findRoomCode(roomname){
+    var id = models.Room.findOne({where:{roomname}}).then((r)=>{
+      return r.code
+    })
+  }
+
   socket.on('joinRoom', (roomname, name) => {
-    socket.join(roomname, function () {
-      io.to(roomname).emit('joinRoom', roomname, name);
-      console.log(name + ' join a ' + roomname);
+    var code = findRoomCode(roomname);
+    socket.join(code, function () {
+      io.to(code).emit('joinRoom', roomname, name);
+      console.log(name + ' join a ' + roomname + "#" + code);
     });
   });
 
   socket.on('leaveRoom', (roomname, name) => {
-    socket.leave(roomname, function () {
-      io.to(roomname).emit('leaveRoom', roomname, name);
-      console.log(name + ' leave a ' + roomname);
+    var code = findRoomCode(roomname);
+    socket.leave(code, function () {
+      io.to(code).emit('leaveRoom', roomname, name);
+      console.log(name + ' leave a ' + roomname + "#" + code);
     });
   });
 
-  console.log(socket.handshake.session.username)
   io.to(socket.id).emit('change name', socket.handshake.session.username);
 
   socket.on('disconnect', function () { //3-2
     console.log('user disconnected: ', socket.id);
   });
 
-  socket.on('send message', function (name, text) { //3-3
+  socket.on('send message', function (roomname, name, text) { //3-3
     text = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
     text = text.toString();
     var msg = name + ' : ' + text;
     console.log(msg);
-    io.emit('receive message', msg);
+    var code = findRoomCode(roomname);
+    io.to(code).emit('receive message', msg);
   });
 });
 
@@ -201,8 +209,6 @@ app.post('/login', function (req, res) {
 app.post('/makeRoom', async (req, res) => {
     var { roomname, password, ...body } = req.body;
     var maker = req.session.username;
-
-
     var room = await models.Room.create({ roomname, password, maker });
     await room.addUser(req.session.userId);
     res.redirect('/')

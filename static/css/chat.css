@@ -218,18 +218,25 @@ section{
 #chating{
     position: relative;
     width: 100%;
-    height: auto;
+    height: 100%;
 }
 
-section h3{color: white;}  
+#chat{
+    position: relative;
+    bottom: 0px
+}
 
-#chatLog{width: 100%; height: 90%; background-color: rgb(146, 146, 146); box-sizing: border-box; border: hidden 0 20px; list-style: none; margin: 0; padding: 0;}
+section h3{color: white; display: flex;}  
 
-#chatLog > li{padding: 4px; margin: 2px 0;}
+#chatLog{overflow-y:scroll ;width: 100%; height:80%; background-color: rgb(146, 146, 146); box-sizing: border-box; border: hidden 0 20px; list-style: none; margin: 0; padding: 0;}
 
-#chatLog > li:hover{ background-color: rgb(100,100,100);}
+.msg {padding: 4px; margin: 2px 0;}
 
-#message{width: 95%; height: 80px; background-color: rgb(184, 184, 184); margin: 0 0 0 20px; padding: 0; outline: none; border: none; border-radius: 8px;}
+.msg:hover{ background-color: rgb(100,100,100);}
+
+#message{width: 100%; height: 80px; background-color: rgb(184, 184, 184); padding: 0; outline: none; border:none;border-radius: 8px;}
+
+
 
 @keyframes letter_spacing{
     0%{
